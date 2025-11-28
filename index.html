@@ -1,107 +1,20 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Consulta por Matrícula</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-        }
-        input, button {
-            padding: 8px;
-            font-size: 16px;
-        }
-        #resultados {
-            margin-top: 30px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        table, th, td {
-            border: 1px solid #999;
-        }
-        th, td {
-            padding: 8px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Consultar Registros</title>
 </head>
 <body>
 
-<h2>Consultar Registros pelo Número da Matrícula</h2>
+  <h2>Consultar Registros pelo Número da Matrícula</h2>
 
-<form id="formBusca">
-    <label>Matrícula:</label>
-    <input type="text" id="matricula" name="matricula" required>
+  <form action="https://long-hall-0aaa.pedro-fillype.workers.dev/buscar" method="POST">
+    Matrícula:
+    <input type="text" name="matricula" required />
     <button type="submit">Buscar</button>
-</form>
+  </form>
 
-<div id="resultados"></div>
-
-<script>
-document.getElementById("formBusca").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData();
-    formData.append("matricula", document.getElementById("matricula").value);
-
-    const resp = await fetch("https://long-hall-0aaa.pedro-fillype.workers.dev/buscar", {
-        method: "POST",
-        body: formData
-    });
-
-    const dados = await resp.json();
-    const div = document.getElementById("resultados");
-
-    if (!dados.results || dados.results.length === 0) {
-        div.innerHTML = "<p>Nenhum registro encontrado.</p>";
-        return;
-    }
-
-    let tabela = `
-        <h3>Resultados encontrados:</h3>
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Nome</th>
-                <th>Regional</th>
-                <th>Polo</th>
-                <th>Data Uso</th>
-                <th>Tipo Refeição</th>
-                <th>Localidade</th>
-                <th>GPS</th>
-                <th>Sequência</th>
-                <th>OS/RR/SS</th>
-                <th>Nº ADD</th>
-                <th>Obs</th>
-            </tr>
-    `;
-
-    dados.results.forEach(r => {
-        tabela += `
-            <tr>
-                <td>${r.id}</td>
-                <td>${r.nome}</td>
-                <td>${r.regional}</td>
-                <td>${r.polo}</td>
-                <td>${r.datauso}</td>
-                <td>${r.tiporefeicao}</td>
-                <td>${r.localidade}</td>
-                <td>${r.gps}</td>
-                <td>${r.sequencia}</td>
-                <td>${r.osrrss}</td>
-                <td>${r.numeroadd}</td>
-                <td>${r.observacao}</td>
-            </tr>
-        `;
-    });
-
-    tabela += "</table>";
-    div.innerHTML = tabela;
-});
-</script>
+  <div id="resultado"></div>
 
 </body>
 </html>
