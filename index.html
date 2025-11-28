@@ -1,305 +1,222 @@
-<!doctype html>
-<html lang="pt-BR">
+<!DOCTYPE html>
+<html lang="pt-br">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Consulta ADD — Matrícula + Gráfico</title>
-
-<!-- Chart.js (CDN) -->
+<meta charset="UTF-8" />
+<title>Consulta de Registros ADD</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-  :root{
-    --energisa-blue: #0097CE;
-    --energisa-orange: #F36F21;
-    --bg: #f4f9fc;
-    --card: #fff;
-    --text: #222;
+  body {
+    font-family: Arial, sans-serif;
+    margin: 30px;
   }
-  body{font-family: "Segoe UI", Roboto, Arial; background:var(--bg); color:var(--text); margin:20px;}
-  .container{max-width:1100px;margin:0 auto;}
-  h1{color:var(--energisa-blue);margin-bottom:6px;}
-  .controls{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 20px;align-items:center;}
-  input[type="text"], select, button {
-    padding:10px 12px;border-radius:8px;border:1px solid #cfd8dc;background:#fff;font-size:14px;
+  h1 {
+    color: #222;
   }
-  button { background: var(--energisa-blue); color:#fff; border:none; font-weight:700; cursor:pointer; }
-  button.secondary { background:#fff; color:var(--energisa-blue); border:1px solid var(--energisa-blue); }
-  .card{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.06); margin-bottom:18px;}
-  #resultados{margin-top:14px;}
-  table{width:100%;border-collapse:collapse;margin-top:8px}
-  th, td{padding:8px;border:1px solid #e6eef6;font-size:13px;text-align:left}
-  th{background:#f0f7fb;color:var(--energisa-blue)}
-  .empty{color:#666;margin-top:12px}
-  .flex-row{display:flex;gap:8px;align-items:center}
-  .chart-wrap{height:360px}
-  .small-muted{font-size:13px;color:#666;margin-top:8px}
+  label {
+    font-weight: bold;
+  }
+  input, select {
+    padding: 5px;
+    margin: 5px;
+  }
+  button {
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+  th, td {
+    border: 1px solid #ccc;
+    padding: 8px;
+  }
+  th {
+    background: #f0f0f0;
+  }
 </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Consulta por Matrícula & Estatísticas</h1>
 
-    <div class="card">
-      <div class="controls">
-        <div style="display:flex;gap:6px;align-items:center">
-          <label for="matricula" style="font-weight:600">Matrícula:</label>
-          <input id="matricula" type="text" placeholder="Ex: 3080117" />
-        </div>
+<h1>Consulta de Registros ADD</h1>
 
-        <div style="display:flex;gap:6px;align-items:center">
-          <label for="year">Ano:</label>
-          <select id="year"><option value="all">— Todos —</option></select>
-        </div>
+<!-- ============================
+     BUSCAR POR MATRÍCULA
+     ============================ -->
+<h2>Buscar por Matrícula</h2>
 
-        <div style="display:flex;gap:6px;align-items:center">
-          <label for="month">Mês:</label>
-          <select id="month">
-            <option value="all">— Todos —</option>
-            <option value="01">Janeiro</option>
-            <option value="02">Fevereiro</option>
-            <option value="03">Março</option>
-            <option value="04">Abril</option>
-            <option value="05">Maio</option>
-            <option value="06">Junho</option>
-            <option value="07">Julho</option>
-            <option value="08">Agosto</option>
-            <option value="09">Setembro</option>
-            <option value="10">Outubro</option>
-            <option value="11">Novembro</option>
-            <option value="12">Dezembro</option>
-          </select>
-        </div>
+<label>Matrícula:</label>
+<input type="text" id="matricula" placeholder="Digite a matrícula">
+<button onclick="buscarMatricula()">Buscar</button>
 
-        <div style="margin-left:auto" class="flex-row">
-          <button id="btnBuscar">Buscar</button>
-          <button id="btnClear" class="secondary">Limpar</button>
-        </div>
-      </div>
+<div id="resultadoMatricula"></div>
 
-      <div class="small-muted">Selecione uma matrícula e clique em Buscar. O gráfico mostra a quantidade de envios por mês (para o ano selecionado).</div>
-    </div>
+<hr>
 
-    <div class="card">
-      <h3>Gráfico: Quantidade enviada por mês</h3>
-      <div class="chart-wrap">
-        <canvas id="barChart"></canvas>
-      </div>
-    </div>
+<!-- ============================
+     ESTATÍSTICAS
+     ============================ -->
+<h2>Estatísticas por Mês</h2>
 
-    <div class="card" id="resultadosCard">
-      <h3>Registros</h3>
-      <div id="resultados"></div>
-    </div>
-  </div>
+<label>Ano:</label>
+<select id="ano">
+  <option value="">Todos</option>
+</select>
+
+<label>Mês:</label>
+<select id="mes">
+  <option value="">Todos</option>
+  <option value="01">Janeiro</option>
+  <option value="02">Fevereiro</option>
+  <option value="03">Março</option>
+  <option value="04">Abril</option>
+  <option value="05">Maio</option>
+  <option value="06">Junho</option>
+  <option value="07">Julho</option>
+  <option value="08">Agosto</option>
+  <option value="09">Setembro</option>
+  <option value="10">Outubro</option>
+  <option value="11">Novembro</option>
+  <option value="12">Dezembro</option>
+</select>
+
+<button onclick="carregarEstatisticas()">Carregar</button>
+
+<canvas id="grafico" width="600" height="250"></canvas>
+
+<div id="totalMes" style="margin-top:20px; font-weight:bold;"></div>
 
 <script>
-(() => {
-  const workerBuscar = "https://long-hall-0aaa.pedro-fillype.workers.dev/buscar"; // ajuste se necessário
+const API = "<https://long-hall-0aaa.pedro-fillype.workers.dev/>";  // <<<<<< ALTERE AQUI!
 
-  const matriculaEl = document.getElementById("matricula");
-  const yearEl = document.getElementById("year");
-  const monthEl = document.getElementById("month");
-  const btnBuscar = document.getElementById("btnBuscar");
-  const btnClear = document.getElementById("btnClear");
-  const resultadosEl = document.getElementById("resultados");
+// ================================================
+//   BUSCA POR MATRÍCULA
+// ================================================
+async function buscarMatricula() {
+  const matricula = document.getElementById("matricula").value;
+  const div = document.getElementById("resultadoMatricula");
+  div.innerHTML = "Carregando...";
 
-  // Chart.js setup
-  const ctx = document.getElementById("barChart").getContext("2d");
-  let barChart = new Chart(ctx, {
+  const resp = await fetch(`${API}/api/buscar?matricula=${matricula}`);
+  const dados = await resp.json();
+
+  if (dados.length === 0) {
+    div.innerHTML = "<p>Nenhum registro encontrado.</p>";
+    return;
+  }
+
+  let html = `
+    <table>
+    <tr>
+      <th>Nome</th>
+      <th>Matrícula</th>
+      <th>Regional</th>
+      <th>Polo</th>
+      <th>Data</th>
+      <th>Horário</th>
+      <th>Tipo</th>
+      <th>Localidade</th>
+      <th>Seq ADD</th>
+      <th>OS/RR/SS</th>
+    </tr>
+  `;
+
+  dados.forEach(l => {
+    html += `
+      <tr>
+        <td>${l.nome}</td>
+        <td>${l.matricula}</td>
+        <td>${l.regional}</td>
+        <td>${l.polo}</td>
+        <td>${l.data_uso}</td>
+        <td>${l.horario}</td>
+        <td>${l.tipo_refeicao}</td>
+        <td>${l.localidade}</td>
+        <td>${l.sequencia_add}</td>
+        <td>${l.os_rr_ss}</td>
+      </tr>
+    `;
+  });
+
+  html += "</table>";
+  div.innerHTML = html;
+}
+
+
+// ============================================
+//   CARREGA ESTATÍSTICAS DO D1
+// ============================================
+let grafico = null;
+
+async function carregarEstatisticas() {
+  const ano = document.getElementById("ano").value;
+  const mes = document.getElementById("mes").value;
+
+  let url = `${API}/api/estatisticas`;
+
+  if (ano && mes) url += `?year=${ano}&month=${mes}`;
+  else if (ano && !mes) url += `?year=${ano}`;
+  else if (!ano && mes) url += `?month=${mes}`;
+
+  const resp = await fetch(url);
+  const dados = await resp.json();
+
+  if (dados.length === 0) {
+    document.getElementById("totalMes").innerHTML = "Nenhum registro.";
+    return;
+  }
+
+  // montar arrays para o gráfico
+  const labels = dados.map(l => `${l.mes}/${l.ano}`);
+  const valores = dados.map(l => l.total);
+
+  // som total
+  const total = valores.reduce((a, b) => a + b, 0);
+  document.getElementById("totalMes").innerHTML = `Total no período: ${total}`;
+
+  // destruir gráfico anterior
+  if (grafico) grafico.destroy();
+
+  grafico = new Chart(document.getElementById("grafico"), {
     type: "bar",
     data: {
-      labels: ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"],
+      labels: labels,
       datasets: [{
-        label: "Envios",
-        data: new Array(12).fill(0),
-        backgroundColor: "rgba(0,151,206,0.85)"
+        label: "Total de Refeições",
+        data: valores
       }]
     },
     options: {
       responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        y: { beginAtZero: true, ticks: { precision:0 } }
-      }
+      scales: { y: { beginAtZero: true } }
     }
   });
+}
 
-  function showMessage(msg) {
-    resultadosEl.innerHTML = `<p class="empty">${msg}</p>`;
-  }
 
-  function normalizeResponse(data) {
-    // aceita várias formas: array direto, { results:[...] }, { results: { rows: [...] } }, etc.
-    if (!data) return [];
-    if (Array.isArray(data)) return data;
-    if (Array.isArray(data.results)) return data.results;
-    if (Array.isArray(data.rows)) return data.rows;
-    // caso Retorne um object {results: {results: [...]}} — tentar encontrar arrays
-    const keys = Object.keys(data);
-    for (const k of keys) {
-      if (Array.isArray(data[k])) return data[k];
-    }
-    return [];
-  }
+// ============================================
+//      Preencher lista de anos
+// ============================================
+async function carregarAnos() {
+  const resp = await fetch(`${API}/api/estatisticas`);
+  const dados = await resp.json();
 
-  function parseDateString(s) {
-    // tenta várias formas: YYYY-MM-DD, ISO, timestamp
-    if (!s) return null;
-    // se já Date
-    if (s instanceof Date) return s;
-    // try ISO
-    const d = new Date(s);
-    if (!isNaN(d)) return d;
-    // fallback null
-    return null;
-  }
+  const anos = [...new Set(dados.map(l => l.ano))];
 
-  function buildTable(rows) {
-    if (!rows || rows.length === 0) return `<p class="empty">Nenhum registro encontrado.</p>`;
-    // cria cabeçalho com campos úteis (mapeie os nomes exatos usados no D1)
-    const cols = ["id","nome","matricula","regional","polo","datauso","tiporefeicao","horario","localidade","gps","sequencia","osrrss","numeroadd","observacao","enviado_em"];
-    let html = "<table><thead><tr>";
-    cols.forEach(c => html += `<th>${c}</th>`);
-    html += "</tr></thead><tbody>";
-    rows.forEach(r => {
-      html += "<tr>";
-      cols.forEach(c => {
-        let val = r[c];
-        if (c === "enviado_em" && val) {
-          const d = parseDateString(val);
-          val = d ? d.toLocaleString() : val;
-        }
-        html += `<td>${val ?? ""}</td>`;
-      });
-      html += "</tr>";
-    });
-    html += "</tbody></table>";
-    return html;
-  }
-
-  function computeMonthlyCounts(rows, year) {
-    // rows expected to have datauso or enviado_em date field
-    const counts = new Array(12).fill(0);
-
-    rows.forEach(r => {
-      // prefer datauso, senão enviado_em
-      const datestr = r.datauso || r.enviado_em || r.criado_em || r.enviadoEm || null;
-      const dt = parseDateString(datestr);
-      if (!dt) return;
-      const y = dt.getFullYear();
-      if (year !== "all" && Number(year) !== y) return;
-      const m = dt.getMonth(); // 0..11
-      counts[m] += 1;
-    });
-
-    return counts;
-  }
-
-  function getYearsFromRows(rows) {
-    const s = new Set();
-    rows.forEach(r => {
-      const datestr = r.datauso || r.enviado_em || r.criado_em || r.enviadoEm || null;
-      const dt = parseDateString(datestr);
-      if (!dt) return;
-      s.add(dt.getFullYear());
-    });
-    const arr = Array.from(s).sort((a,b)=>b-a);
-    return arr;
-  }
-
-  async function fetchByMatricula(matricula) {
-    const fd = new FormData();
-    fd.append("matricula", String(matricula || "").trim());
-    const res = await fetch(workerBuscar, { method: "POST", body: fd });
-    const txt = await res.text();
-    let parsed;
-    try { parsed = JSON.parse(txt); } catch(e) { parsed = null; }
-    return parsed ?? txt;
-  }
-
-  async function atualizar() {
-    const mat = String(matriculaEl.value || "").trim();
-    if (!mat) { showMessage("Digite a matrícula para buscar."); return; }
-
-    btnBuscar.disabled = true;
-    btnBuscar.innerText = "Buscando...";
-
-    try {
-      const data = await fetchByMatricula(mat);
-      const rows = normalizeResponse(data);
-
-      // preenche dropdown de anos
-      const years = getYearsFromRows(rows);
-      // limpa e repopula (mantém "all" como primeira opção)
-      const curYear = yearEl.value || "all";
-      yearEl.innerHTML = '<option value="all">— Todos —</option>';
-      years.forEach(y => {
-        const op = document.createElement("option");
-        op.value = String(y);
-        op.textContent = String(y);
-        yearEl.appendChild(op);
-      });
-      // tenta reaplicar seleção anterior se existir
-      if (years.length && years.includes(Number(curYear))) {
-        yearEl.value = curYear;
-      }
-
-      // filtra por ano/mes selecionados (para tabela)
-      const chosenYear = yearEl.value || "all";
-      const chosenMonth = monthEl.value || "all";
-
-      let filtered = rows.slice();
-      if (chosenYear !== "all") {
-        filtered = filtered.filter(r => {
-          const d = parseDateString(r.datauso || r.enviado_em || r.criado_em);
-          return d && d.getFullYear() === Number(chosenYear);
-        });
-      }
-      if (chosenMonth !== "all") {
-        filtered = filtered.filter(r => {
-          const d = parseDateString(r.datauso || r.enviado_em || r.criado_em);
-          return d && (d.getMonth()+1) === Number(chosenMonth);
-        });
-      }
-
-      // tabela
-      resultadosEl.innerHTML = buildTable(filtered);
-
-      // gráfico: counts por mês no ano escolhido (se all -> mostra counts para todos os anos somados)
-      const counts = computeMonthlyCounts(rows, chosenYear);
-      barChart.data.datasets[0].data = counts;
-      barChart.update();
-
-    } catch (err) {
-      console.error(err);
-      showMessage("Erro ao buscar dados. Veja console (F12).");
-    } finally {
-      btnBuscar.disabled = false;
-      btnBuscar.innerText = "Buscar";
-    }
-  }
-
-  // eventos
-  btnBuscar.addEventListener("click", atualizar);
-  btnClear.addEventListener("click", ()=> {
-    matriculaEl.value = "";
-    yearEl.value = "all";
-    monthEl.value = "all";
-    resultadosEl.innerHTML = "";
-    barChart.data.datasets[0].data = new Array(12).fill(0);
-    barChart.update();
+  const selectAno = document.getElementById("ano");
+  anos.forEach(a => {
+    const op = document.createElement("option");
+    op.value = a;
+    op.textContent = a;
+    selectAno.appendChild(op);
   });
+}
 
-  // atualiza automaticamente ao mudar ano ou mês (se já houver matrícula)
-  yearEl.addEventListener("change", ()=> {
-    if (matriculaEl.value.trim()) atualizar();
-  });
-  monthEl.addEventListener("change", ()=> {
-    if (matriculaEl.value.trim()) atualizar();
-  });
-
-})();
+// iniciar
+carregarAnos();
 </script>
+
 </body>
 </html>
