@@ -119,14 +119,28 @@
     }
 
     async function buscar() {
-        const matricula = document.getElementById("matricula").value;
+        const matricula = document.getElementById("matricula").value.trim();
         const mes = document.getElementById("mes").value;
         const ano = document.getElementById("ano").value;
 
-        const url = `https://long-hall-0aaa.pedro-fillype.workers.dev/get-registros?matricula=${matricula}&mes=${mes}&ano=${ano}`;
+        if (!matricula) {
+            alert("Informe a matrícula!");
+            return;
+        }
+
+        const url = `https://long-hall-0aaa.pedro-fillype.workers.dev/buscar?matricula=${matricula}&mes=${mes}&ano=${ano}`;
 
         const resposta = await fetch(url);
         const dados = await resposta.json();
+
+        // Evita erro caso a API retorne objeto de erro
+        if (!Array.isArray(dados)) {
+            alert("Nenhum registro encontrado!");
+            console.error("Resposta inesperada:", dados);
+            preencherTabela([]);
+            atualizarGrafico([]);
+            return;
+        }
 
         preencherTabela(dados);
         atualizarGrafico(dados);
@@ -159,7 +173,7 @@
         const contagem = {};
 
         dados.forEach(item => {
-            if (!item.datauso) return;
+            if (!item.datauso || !item.datauso.includes("-")) return;
 
             const [ano, mes] = item.datauso.split("-");
             const chave = `${mes}/${ano}`;
@@ -180,7 +194,8 @@
                 labels,
                 datasets: [{
                     label: "Quantidade",
-                    data: valores
+                    data: valores,
+                    backgroundColor: "rgba(13,110,253,0.7)"
                 }]
             },
             options: {
