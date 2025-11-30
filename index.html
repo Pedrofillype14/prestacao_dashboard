@@ -123,6 +123,22 @@
 <script>
     let grafico = null;
 
+    /* 🔐 PEGAR MATRÍCULA SALVA NO LOGIN */
+    const matriculaLogin = localStorage.getItem("usuarioLogado");
+
+    // Se não estiver logado, volta para o login
+    if (!matriculaLogin) {
+        window.location.href = "https://pedrofillype14.github.io/";
+    }
+
+    // Preencher o campo matrícula quando a página carregar
+    window.onload = function () {
+        const campo = document.getElementById("matricula");
+        campo.value = matriculaLogin;
+        campo.readOnly = true;
+        campo.style.background = "#e9ecef";
+    };
+
     // Preenche anos automaticamente
     const anoSelect = document.getElementById("ano");
     const anoAtual = new Date().getFullYear();
@@ -131,21 +147,18 @@
     }
 
     async function buscar() {
-        const matricula = document.getElementById("matricula").value.trim();
+        // AGORA SEMPRE USA A MATRÍCULA DO LOGIN
+        const matricula = matriculaLogin;
+
         const mes = document.getElementById("mes").value;
         const ano = document.getElementById("ano").value;
-
-        if (!matricula) {
-            alert("Informe a matrícula!");
-            return;
-        }
 
         const url = `https://long-hall-0aaa.pedro-fillype.workers.dev/buscar?matricula=${matricula}&mes=${mes}&ano=${ano}`;
 
         const resposta = await fetch(url);
         const dados = await resposta.json();
 
-        if (!Array.isArray(dados)) {
+        if (!Array.isArray(dados) || dados.length === 0) {
             alert("Nenhum registro encontrado!");
             preencherTabela([]);
             atualizarGrafico([]);
@@ -194,7 +207,7 @@
             contagem[chave] = (contagem[chave] || 0) + 1;
         });
 
-        // --- ORDENAR POR MÊS E ANO ---
+        // Ordenação correta por mês/ano
         let entries = Object.entries(contagem);
 
         entries.sort((a, b) => {
@@ -209,7 +222,6 @@
 
         const labels = entries.map(e => e[0]);
         const valores = entries.map(e => e[1]);
-        // ------------------------------
 
         if (grafico) grafico.destroy();
 
