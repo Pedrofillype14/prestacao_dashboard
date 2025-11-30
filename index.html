@@ -136,10 +136,8 @@
         const resposta = await fetch(url);
         const dados = await resposta.json();
 
-        // Evita erro caso a API retorne objeto de erro
         if (!Array.isArray(dados)) {
             alert("Nenhum registro encontrado!");
-            console.error("Resposta inesperada:", dados);
             preencherTabela([]);
             atualizarGrafico([]);
             return;
@@ -176,56 +174,56 @@
     }
 
     function atualizarGrafico(dados) {
-    const contagem = {};
+        const contagem = {};
 
-    dados.forEach(item => {
-        if (!item.datauso || !item.datauso.includes("-")) return;
+        dados.forEach(item => {
+            if (!item.datauso || !item.datauso.includes("-")) return;
 
-        const [ano, mes] = item.datauso.split("-");
-        const chave = `${mes}/${ano}`;
+            const [ano, mes] = item.datauso.split("-");
+            const chave = `${mes}/${ano}`;
 
-        contagem[chave] = (contagem[chave] || 0) + 1;
-    });
+            contagem[chave] = (contagem[chave] || 0) + 1;
+        });
 
-    // --- ORDENAR POR MÊS E ANO ---
-    let entries = Object.entries(contagem);
+        // --- ORDENAR POR MÊS E ANO ---
+        let entries = Object.entries(contagem);
 
-    entries.sort((a, b) => {
-        const [mesA, anoA] = a[0].split("/");
-        const [mesB, anoB] = b[0].split("/");
+        entries.sort((a, b) => {
+            const [mesA, anoA] = a[0].split("/");
+            const [mesB, anoB] = b[0].split("/");
 
-        const dataA = new Date(`${anoA}-${mesA}-01`);
-        const dataB = new Date(`${anoB}-${mesB}-01`);
+            const dataA = new Date(`${anoA}-${mesA}-01`);
+            const dataB = new Date(`${anoB}-${mesB}-01`);
 
-        return dataA - dataB;
-    });
+            return dataA - dataB;
+        });
 
-    const labels = entries.map(e => e[0]);
-    const valores = entries.map(e => e[1]);
-    // ------------------------------
+        const labels = entries.map(e => e[0]);
+        const valores = entries.map(e => e[1]);
+        // ------------------------------
 
-    if (grafico) grafico.destroy();
+        if (grafico) grafico.destroy();
 
-    const ctx = document.getElementById("graficoMes");
+        const ctx = document.getElementById("graficoMes");
 
-    grafico = new Chart(ctx, {
-        type: "bar",
-        data: {
-            labels,
-            datasets: [{
-                label: "Quantidade",
-                data: valores,
-                backgroundColor: "rgba(13,110,253,0.7)"
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: { beginAtZero: true }
+        grafico = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels,
+                datasets: [{
+                    label: "Quantidade",
+                    data: valores,
+                    backgroundColor: "rgba(13,110,253,0.7)"
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
             }
-        }
-    });
-}
+        });
+    }
 </script>
 
 </body>
