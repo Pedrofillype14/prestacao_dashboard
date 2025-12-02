@@ -3,25 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consulta de Registros</title>
+    <title>Consulta de Refeições</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- SheetJS -->
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
+        :root {
+            --energisa-blue: #0097CE;
+            --energisa-blue-dark: #0079a6;
+            --energisa-orange: #F36F21;
+            --bg-soft: #f5f7fa;
+        }
+
         body {
-            background: #f5f7fa;
-            padding: 20px;
+            background: var(--bg-soft);
+            padding: 25px;
+            font-family: Arial, sans-serif;
         }
+
         .card {
-            border-radius: 12px;
+            border-radius: 14px;
+            border: none;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
         }
-        table thead {
-            background: #0d6efd;
+
+        .header-title {
+            background: var(--energisa-blue);
+            padding: 15px 20px;
             color: white;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.6rem;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+
+        table thead {
+            background: var(--energisa-blue-dark);
+            color: white;
+        }
+
+        .btn-energisa {
+            background: var(--energisa-blue);
+            color: white;
+            border-radius: 8px;
+        }
+
+        .btn-energisa:hover {
+            background: var(--energisa-blue-dark);
+            color: white;
+        }
+
+        .btn-orange {
+            background: var(--energisa-orange);
+            color: white;
+            border-radius: 8px;
+        }
+
+        .btn-orange:hover {
+            background: #d15f1c;
+        }
+
+        .logout-btn {
+            background: #dc3545 !important;
+            color: white;
+            border-radius: 8px;
         }
     </style>
 </head>
@@ -29,29 +82,37 @@
 
 <div class="container">
 
-        <!-- BOTÃO VOLTAR + LINK ADMINISTRADOR -->
-    <div class="mb-3 d-flex gap-2">
-        <a href="https://pedrofillype14.github.io/prestacao_de_contas/" 
-           class="btn btn-outline-primary">
-            ⬅️ Voltar para Prestação de Contas
-        </a>
-    
-        <a href="https://pedrofillype14.github.io/administrador/" 
-           class="btn btn-dark">
-            🔐 Acesso do Administrador
-        </a>
+    <!-- TOPO COM VOLTAR + ADMIN + LOGOUT -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div class="d-flex gap-2">
+            <a href="https://pedrofillype14.github.io/prestacao_de_contas/" 
+               class="btn btn-energisa">
+                ⬅️ Voltar
+            </a>
+
+            <a href="https://pedrofillype14.github.io/administrador/" 
+               class="btn btn-dark">
+                🔐 Administração
+            </a>
+        </div>
+
+        <button class="btn logout-btn" onclick="logout()">🚪 Sair</button>
     </div>
 
-    <h2 class="text-center mb-4">📊 Consulta de Refeições</h2>
-
+    <div class="header-title">
+        📊 Consulta de Refeições
+    </div>
 
     <!-- 🔎 FILTROS -->
-    <div class="card p-3 mb-4 shadow-sm">
+    <div class="card p-3 mb-4">
+        <h5 class="mb-3">Filtros da consulta</h5>
+
         <div class="row g-3">
 
             <div class="col-md-4">
-                <label class="form-label">Pesquisar pela Matrícula:</label>
-                <input type="text" id="matricula" class="form-control" placeholder="Ex: 31313">
+                <label class="form-label">Matrícula (bloqueada):</label>
+                <input type="text" id="matricula" class="form-control" readonly>
             </div>
 
             <div class="col-md-3">
@@ -75,28 +136,25 @@
 
             <div class="col-md-3">
                 <label class="form-label">Ano:</label>
-                <select id="ano" class="form-select">
-                    <option value="">Todos</option>
-                </select>
+                <select id="ano" class="form-select"></select>
             </div>
 
             <div class="col-md-2 d-flex align-items-end">
-                <button class="btn btn-primary w-100" onclick="buscar()">
-                    Buscar
-                </button>
+                <button class="btn btn-energisa w-100" onclick="buscar()">Buscar</button>
             </div>
         </div>
     </div>
 
     <!-- 📈 GRÁFICO -->
-    <div class="card p-4 shadow-sm mb-4">
-        <h5 class="mb-3">Quantidade enviada por mês</h5>
+    <div class="card p-4 mb-4">
+        <h5 class="mb-3">📅 Quantidade enviada por mês</h5>
         <canvas id="graficoMes"></canvas>
     </div>
 
     <!-- 📋 TABELA -->
-    <div class="card p-3 shadow-sm">
-        <h5 class="mb-3">Resultados</h5>
+    <div class="card p-3">
+        <h5 class="mb-3">📋 Resultados encontrados</h5>
+
         <div class="table-responsive">
             <table class="table table-bordered" id="tabela">
                 <thead>
@@ -108,13 +166,13 @@
                     <th>Polo</th>
                     <th>Matrícula</th>
                     <th>Data Uso</th>
-                    <th>Tipo de Refeição</th>
+                    <th>Tipo Refeição</th>
                     <th>Horário</th>
                     <th>Localidade</th>
                     <th>GPS</th>
-                    <th>Sequência do ADD</th>
-                    <th>Nº OS / RR / SS</th>
-                    <th>Número do ADD</th>
+                    <th>Sequência</th>
+                    <th>OS/RR/SS</th>
+                    <th>Nº ADD</th>
                 </tr>
                 </thead>
                 <tbody></tbody>
@@ -124,37 +182,37 @@
 
 </div>
 
-
 <script>
     let grafico = null;
 
-    /* 🔐 PEGAR MATRÍCULA SALVA NO LOGIN */
+    /* PEGAR MATRÍCULA DO LOGIN */
     const matriculaLogin = localStorage.getItem("matricula");
 
-    // Se não estiver logado, volta para o login
     if (!matriculaLogin) {
         window.location.href = "https://pedrofillype14.github.io/login/";
     }
 
-    // Preencher o campo matrícula quando a página carregar
-    window.onload = function () {
-        const campo = document.getElementById("matricula");
-        campo.value = matriculaLogin;
-        campo.readOnly = true;
-        campo.style.background = "#e9ecef";
+    // Preencher matrícula bloqueada
+    window.onload = () => {
+        document.getElementById("matricula").value = matriculaLogin;
+
+        const anoAtual = new Date().getFullYear();
+        const anoSelect = document.getElementById("ano");
+
+        for (let a = anoAtual; a >= anoAtual - 5; a--) {
+            anoSelect.innerHTML += `<option value="${a}">${a}</option>`;
+        }
     };
 
-    // Preenche anos automaticamente
-    const anoSelect = document.getElementById("ano");
-    const anoAtual = new Date().getFullYear();
-    for (let a = anoAtual; a >= anoAtual - 5; a--) {
-        anoSelect.innerHTML += `<option value="${a}">${a}</option>`;
+    /* BOTÃO LOGOUT */
+    function logout() {
+        localStorage.removeItem("matricula");
+        window.location.href = "https://pedrofillype14.github.io/login/";
     }
 
+    /* BUSCAR DO WORKER */
     async function buscar() {
-        // AGORA SEMPRE USA A MATRÍCULA DO LOGIN
         const matricula = matriculaLogin;
-
         const mes = document.getElementById("mes").value;
         const ano = document.getElementById("ano").value;
 
@@ -164,9 +222,9 @@
         const dados = await resposta.json();
 
         if (!Array.isArray(dados) || dados.length === 0) {
-            alert("Nenhum registro encontrado!");
             preencherTabela([]);
             atualizarGrafico([]);
+            alert("Nenhum registro encontrado.");
             return;
         }
 
@@ -174,6 +232,7 @@
         atualizarGrafico(dados);
     }
 
+    /* TABELA */
     function preencherTabela(dados) {
         const tabela = document.querySelector("#tabela tbody");
         tabela.innerHTML = "";
@@ -200,29 +259,23 @@
         });
     }
 
+    /* GRÁFICO */
     function atualizarGrafico(dados) {
         const contagem = {};
 
         dados.forEach(item => {
-            if (!item.datauso || !item.datauso.includes("-")) return;
+            if (!item.datauso) return;
 
             const [ano, mes] = item.datauso.split("-");
-            const chave = `${mes}/${ano}`;
-
-            contagem[chave] = (contagem[chave] || 0) + 1;
+            const key = `${mes}/${ano}`;
+            contagem[key] = (contagem[key] || 0) + 1;
         });
 
-        // Ordenação correta por mês/ano
-        let entries = Object.entries(contagem);
-
-        entries.sort((a, b) => {
+        const entries = Object.entries(contagem).sort((a, b) => {
             const [mesA, anoA] = a[0].split("/");
             const [mesB, anoB] = b[0].split("/");
 
-            const dataA = new Date(`${anoA}-${mesA}-01`);
-            const dataB = new Date(`${anoB}-${mesB}-01`);
-
-            return dataA - dataB;
+            return new Date(`${anoA}-${mesA}-01`) - new Date(`${anoB}-${mesB}-01`);
         });
 
         const labels = entries.map(e => e[0]);
@@ -230,24 +283,17 @@
 
         if (grafico) grafico.destroy();
 
-        const ctx = document.getElementById("graficoMes");
-
-        grafico = new Chart(ctx, {
+        grafico = new Chart(document.getElementById("graficoMes"), {
             type: "bar",
             data: {
                 labels,
                 datasets: [{
-                    label: "Quantidade",
+                    label: "Quantidade de registros",
                     data: valores,
-                    backgroundColor: "rgba(13,110,253,0.7)"
+                    backgroundColor: "rgba(0, 151, 206, .7)"
                 }]
             },
-            options: {
-                responsive: true,
-                scales: {
-                    y: { beginAtZero: true }
-                }
-            }
+            options: { responsive: true }
         });
     }
 </script>
