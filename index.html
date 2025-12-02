@@ -29,21 +29,17 @@
 
 <div class="container">
 
-        <!-- BOTÃO VOLTAR + BOTÃO ADMIN (mostra apenas se for admin) -->
-<div class="mb-3 d-flex gap-2">
-    <a href="https://pedrofillype14.github.io/prestacao_de_contas/" 
-       class="btn btn-outline-primary">
-        ⬅️ Voltar para Prestação de Contas
-    </a>
-
-    <!-- BOTÃO DO ADMINISTRADOR (oculto por padrão) -->
-    <a id="btnAdmin" 
-       href="https://pedrofillype14.github.io/administrador/" 
-       class="btn btn-dark"
-       style="display:none;">
-        🔐 Acesso do Administrador
-    </a>
-</div>
+        <!-- BOTÃO VOLTAR + LINK ADMINISTRADOR -->
+    <div class="mb-3 d-flex gap-2">
+        <a href="https://pedrofillype14.github.io/prestacao_de_contas/" 
+           class="btn btn-outline-primary">
+            ⬅️ Voltar para Prestação de Contas
+        </a>
+    
+        <a href="https://pedrofillype14.github.io/administrador/" 
+           class="btn btn-dark">
+            🔐 Acesso do Administrador
+        </a>
     </div>
 
     <h2 class="text-center mb-4">📊 Consulta de Refeições</h2>
@@ -130,7 +126,6 @@
 
 
 <script>
-    const ADMINS = ["3080117", "10374"]; // matrículas permitidas
     let grafico = null;
 
     /* 🔐 PEGAR MATRÍCULA SALVA NO LOGIN */
@@ -255,13 +250,6 @@
             }
         });
     }
-    /* 🔐 PEGAR MATRÍCULA SALVA NO LOGIN */
-const matriculaLogin = localStorage.getItem("matricula");
-
-// 🔍 Mostrar botão de administrador apenas se for admin
-if (ADMINS.includes(matriculaLogin)) {
-    document.getElementById("btnAdmin").style.display = "inline-block";
-}
 </script>
 
 </body>
